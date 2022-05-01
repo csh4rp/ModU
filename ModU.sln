@@ -2,6 +2,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModU.Abstract", "src\ModU.Abstract\ModU.Abstract.csproj", "{1F9AB705-E860-438F-8EFE-9790E3F6DB49}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DE601514-CEAA-41F0-8EF8-C4D740DA5F2A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1BF89A15-9A74-4FC9-BE40-77E5E3105412}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModU.Infrastructure", "src\ModU.Infrastructure\ModU.Infrastructure.csproj", "{A284D450-7D42-4D15-8BFF-AE6A0D09C67E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModU.Infrastructure.Tests", "tests\ModU.Infrastructure.Tests\ModU.Infrastructure.Tests.csproj", "{3C47242D-795B-4F97-BEF2-D928DA931DE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +20,18 @@ Global
 		{1F9AB705-E860-438F-8EFE-9790E3F6DB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F9AB705-E860-438F-8EFE-9790E3F6DB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F9AB705-E860-438F-8EFE-9790E3F6DB49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A284D450-7D42-4D15-8BFF-AE6A0D09C67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A284D450-7D42-4D15-8BFF-AE6A0D09C67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A284D450-7D42-4D15-8BFF-AE6A0D09C67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A284D450-7D42-4D15-8BFF-AE6A0D09C67E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C47242D-795B-4F97-BEF2-D928DA931DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C47242D-795B-4F97-BEF2-D928DA931DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C47242D-795B-4F97-BEF2-D928DA931DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C47242D-795B-4F97-BEF2-D928DA931DE4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1F9AB705-E860-438F-8EFE-9790E3F6DB49} = {DE601514-CEAA-41F0-8EF8-C4D740DA5F2A}
+		{A284D450-7D42-4D15-8BFF-AE6A0D09C67E} = {DE601514-CEAA-41F0-8EF8-C4D740DA5F2A}
+		{3C47242D-795B-4F97-BEF2-D928DA931DE4} = {1BF89A15-9A74-4FC9-BE40-77E5E3105412}
 	EndGlobalSection
 EndGlobal
