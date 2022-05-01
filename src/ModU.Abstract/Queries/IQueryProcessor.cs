@@ -2,5 +2,5 @@
 
 public interface IQueryProcessor
 {
-    Task<TResult> HandleAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = new());
+    Task<TResult> ProcessAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = new());
 }

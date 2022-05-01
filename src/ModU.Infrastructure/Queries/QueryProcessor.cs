@@ -1,0 +1,33 @@
+using System.Collections.Concurrent;
+using ModU.Abstract.Queries;
+
+namespace ModU.Infrastructure.Queries;
+
+internal sealed class QueryProcessor : IQueryProcessor
+{
+    private static readonly ConcurrentDictionary<Type, object> Executors = new();
+    private readonly IServiceProvider _serviceProvider;
+
+    public QueryProcessor(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    public Task<TResult> ProcessAsync<TResult>(IQuery<TResult> command, CancellationToken cancellationToken = new())
+    {
+        var commandType = command.GetType();
+        var resultType = typeof(TResult);
+        var handlerType = typeof(IQueryHandler<,>).MakeGenericType(commandType, resultType);
+        var handler = _serviceProvider.GetService(handlerType);
+        if (handler is null)
+        {
+            throw new InvalidOperationException($"Handler for command of type '{commandType}' was not registered");
+        }
+
+        var executorType = typeof(QueryHandlerExecutor<,>).MakeGenericType(commandType, resultType);
+        var executor = (BaseQueryHandlerExecutor<TResult>) Executors.GetOrAdd(executorType, 
+            t => (BaseQueryHandlerExecutor<TResult>)Activator.CreateInstance(t)!);
+        return executor.ExecuteHandlerAsync(handler, command, cancellationToken);
+    }
+
+}
