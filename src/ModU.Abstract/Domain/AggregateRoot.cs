@@ -4,14 +4,26 @@ namespace ModU.Abstract.Domain;
 
 public abstract class AggregateRoot : Entity
 {
-    private readonly List<IDomainEvent> _domainEvents = new();
+    private List<IDomainEvent>? _domainEvents;
 
-    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents;
+    public IReadOnlyCollection<IDomainEvent> DomainEvents
+    {
+        get
+        {
+            if (_domainEvents is null)
+            {
+                return Array.Empty<IDomainEvent>();
+            }
+
+            return _domainEvents;
+        }
+    }
 
     protected void AddEvent(IDomainEvent domainEvent)
     {
+        _domainEvents ??= new List<IDomainEvent>();
         _domainEvents.Add(domainEvent);
     }
 
-    public void ClearEvents() => _domainEvents.Clear();
+    public void ClearEvents() => _domainEvents?.Clear();
 }
