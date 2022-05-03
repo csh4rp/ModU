@@ -5,6 +5,22 @@ namespace ModU.Infrastructure.DependencyInjection;
 
 public static class Extensions
 {
+    public static IServiceCollection Decorate(this IServiceCollection serviceCollection, Type serviceType, Type decoratorType)
+    {
+        var serviceToWrap = serviceCollection.FirstOrDefault(s => s.ServiceType == serviceType);
+        if (serviceToWrap is null)
+        {
+            throw new InvalidOperationException($"Service of type: '{serviceType}' is not registered.");
+        }
+
+        var factory = ActivatorUtilities.CreateFactory(decoratorType, new[] {serviceType});
+
+        serviceCollection.Replace(ServiceDescriptor.Describe(serviceType,
+            s => factory(s, new[] {s.CreateInstance(serviceToWrap)}), serviceToWrap.Lifetime));
+        
+        return serviceCollection;
+    }
+    
     public static IServiceCollection Decorate<TService, TDecorator>(this IServiceCollection serviceCollection)
     {
         var serviceToWrap = serviceCollection.FirstOrDefault(s => s.ServiceType == typeof(TService));

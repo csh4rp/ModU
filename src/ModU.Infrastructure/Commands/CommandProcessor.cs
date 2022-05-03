@@ -8,10 +8,7 @@ internal sealed class CommandProcessor : ICommandProcessor
     private static readonly ConcurrentDictionary<Type, object> Executors = new();
     private readonly IServiceProvider _serviceProvider;
 
-    public CommandProcessor(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    public CommandProcessor(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
     public Task ProcessAsync(ICommand command, CancellationToken cancellationToken = new())
     {
