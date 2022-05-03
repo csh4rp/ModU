@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace ModU.Abstract.Messaging;
+﻿namespace ModU.Abstract.Messaging.Contracts;
 
 internal sealed class PropertyContract
 {

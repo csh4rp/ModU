@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using ModU.Abstract.Queries;
 using ModU.Infrastructure.Queries;
-using ModU.Infrastructure.Tests.Queries.Fakes;
+using ModU.Infrastructure.Tests.Queries.TestData;
 using NSubstitute;
 using Xunit;
 
@@ -22,20 +22,25 @@ public class QueryProcessorTests
     [Fact]
     public async Task Should_InvokeHandler_When_HandlerIsRegistered()
     {
-        var handlerMock = Substitute.For<IQueryHandler<FakeQuery, int>>();
-        _serviceProvider.GetService(typeof(IQueryHandler<FakeQuery, int>)).Returns(handlerMock);
-        var query = new FakeQuery();
+        // Arrange
+        var handlerMock = Substitute.For<IQueryHandler<TestQuery, int>>();
+        _serviceProvider.GetService(typeof(IQueryHandler<TestQuery, int>)).Returns(handlerMock);
+        var query = new TestQuery();
 
+        // Act
         await Act(query);
 
+        // Assert
         await handlerMock.Received(1).HandleAsync(query);
     }
 
     [Fact]
     public async Task Should_NotInvokeHandler_WhenHandlerWasNotRegistered()
     {
-        var query = new FakeQuery();
+        // Arrange
+        var query = new TestQuery();
 
+        // Act & Assert 
         await Assert.ThrowsAsync<InvalidOperationException>(() => Act(query));
     }
     
