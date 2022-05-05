@@ -3,16 +3,22 @@ using Microsoft.Extensions.DependencyInjection;
 using ModU.Abstract.Commands;
 using ModU.Abstract.Commands.Attributes;
 using ModU.Infrastructure.Commands.Decorators;
+using ModU.Infrastructure.Database;
 using ModU.Infrastructure.DependencyInjection;
 
 namespace ModU.Infrastructure.Commands;
 
 public static class Extensions
 {
-    public static IServiceCollection AddCommands(this IServiceCollection serviceCollection, Assembly assembly)
+    public static IServiceCollection AddCommandHandlers(this IServiceCollection serviceCollection, Assembly assembly, Type dbContextType)
     {
-        serviceCollection.AddSingleton<ICommandProcessor, CommandProcessor>();
+        if (!dbContextType.IsAssignableTo(typeof(BaseDbContext)))
+        {
+            throw new InvalidOperationException($"Cannot register type: '{dbContextType}' as context.");
+        }
 
+        var registry = new UnitOfWorkTypeRegistry();
+        
         var handlerTypesWithoutResult = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
 
@@ -25,6 +31,7 @@ public static class Extensions
             var genericTypeArgument = type.GetGenericArguments().Single();
             var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
             serviceCollection.AddTransient(@interface, type);
+            registry.Add(@interface, dbContextType);
 
             if (transactionalAttribute is not null)
             {
@@ -36,9 +43,10 @@ public static class Extensions
         foreach (var type in handlerTypesWithResult)
         {
             var @interface = type.GetInterfaces().Single();
+            var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
             var genericTypeArguments = type.GetGenericArguments();
             serviceCollection.AddTransient(@interface, type);
-            var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
+            registry.Add(@interface, dbContextType);
 
             if (transactionalAttribute is not null)
             {
@@ -46,6 +54,8 @@ public static class Extensions
                     typeof(TransactionalDecorator<>).MakeGenericType(genericTypeArguments));
             }
         }
+
+        serviceCollection.AddSingleton(registry);
 
         return serviceCollection;
     }
