@@ -6,24 +6,51 @@ namespace ModU.Infrastructure.Commands.Decorators;
 internal sealed class TransactionalDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
 {
     private readonly ICommandHandler<TCommand> _handler;
-    private readonly UnitOfWorkTypeRegistry _unitOfWorkTypeRegistry;
+    private readonly UnitOfWorTypeRegistry _unitOfWorTypeRegistry;
     private readonly IServiceProvider _serviceProvider;
 
-    public TransactionalDecorator(ICommandHandler<TCommand> handler, UnitOfWorkTypeRegistry unitOfWorkTypeRegistry, IServiceProvider serviceProvider)
+    public TransactionalDecorator(ICommandHandler<TCommand> handler, UnitOfWorTypeRegistry unitOfWorTypeRegistry, IServiceProvider serviceProvider)
     {
         _handler = handler;
-        _unitOfWorkTypeRegistry = unitOfWorkTypeRegistry;
+        _unitOfWorTypeRegistry = unitOfWorTypeRegistry;
         _serviceProvider = serviceProvider;
     }
 
-    public async Task HandleAsync(TCommand command, CancellationToken cancellationToken = new())
+    public Task HandleAsync(TCommand command, CancellationToken cancellationToken = new())
     {
-        if (!_unitOfWorkTypeRegistry.TryGetContextType(typeof(ICommandHandler<TCommand>), out var type))
+        if (!_unitOfWorTypeRegistry.TryGetContextType(typeof(ICommandHandler<TCommand>), out var unitOfWorkType))
         {
             throw new InvalidOperationException(
-                $"Unit of work is not registered for type: '{typeof(ICommandHandler<TCommand>)}'");
+                $"Unit of work is not registered for type: '{typeof(ICommandHandler<TCommand>)}'.");
         }
 
-        var context = _serviceProvider.GetRequiredService(typeof(UnitOfWork<>).MakeGenericType(type));
+        var unitOffWork = (IUnitOffWork) _serviceProvider.GetRequiredService(unitOfWorkType!);
+        return unitOffWork.ExecuteAsync(command, _handler, cancellationToken);
+    }
+}
+
+internal sealed class TransactionalDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult> where TCommand : ICommand<TResult>
+{
+    private readonly ICommandHandler<TCommand, TResult> _handler;
+    private readonly UnitOfWorTypeRegistry _unitOfWorTypeRegistry;
+    private readonly IServiceProvider _serviceProvider;
+
+    public TransactionalDecorator(ICommandHandler<TCommand, TResult> handler, UnitOfWorTypeRegistry unitOfWorTypeRegistry, IServiceProvider serviceProvider)
+    {
+        _handler = handler;
+        _unitOfWorTypeRegistry = unitOfWorTypeRegistry;
+        _serviceProvider = serviceProvider;
+    }
+
+    public Task<TResult> HandleAsync(TCommand command, CancellationToken cancellationToken = new())
+    {
+        if (!_unitOfWorTypeRegistry.TryGetContextType(typeof(ICommandHandler<TCommand, TResult>), out var unitOfWorkType))
+        {
+            throw new InvalidOperationException(
+                $"Unit of work is not registered for type: '{typeof(ICommandHandler<TCommand, TResult>)}'.");
+        }
+
+        var unitOffWork = (IUnitOffWork) _serviceProvider.GetRequiredService(unitOfWorkType!);
+        return unitOffWork.ExecuteAsync(command, _handler, cancellationToken);
     }
 }

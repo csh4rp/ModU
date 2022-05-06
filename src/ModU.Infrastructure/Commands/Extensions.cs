@@ -10,14 +10,14 @@ namespace ModU.Infrastructure.Commands;
 
 public static class Extensions
 {
-    public static IServiceCollection AddCommandHandlers(this IServiceCollection serviceCollection, Assembly assembly, Type dbContextType)
+    public static IServiceCollection AddCommandHandlers(this IServiceCollection serviceCollection, Assembly assembly, Type unitOfWorkType)
     {
-        if (!dbContextType.IsAssignableTo(typeof(BaseDbContext)))
+        if (!unitOfWorkType.IsAssignableTo(typeof(BaseDbContext)))
         {
-            throw new InvalidOperationException($"Cannot register type: '{dbContextType}' as context.");
+            throw new InvalidOperationException($"Cannot register type: '{unitOfWorkType}' as context.");
         }
 
-        var registry = new UnitOfWorkTypeRegistry();
+        var registry = new UnitOfWorTypeRegistry();
         
         var handlerTypesWithoutResult = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
@@ -31,7 +31,7 @@ public static class Extensions
             var genericTypeArgument = type.GetGenericArguments().Single();
             var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
             serviceCollection.AddTransient(@interface, type);
-            registry.Add(@interface, dbContextType);
+            registry.Add(@interface, unitOfWorkType);
 
             if (transactionalAttribute is not null)
             {
@@ -46,12 +46,12 @@ public static class Extensions
             var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
             var genericTypeArguments = type.GetGenericArguments();
             serviceCollection.AddTransient(@interface, type);
-            registry.Add(@interface, dbContextType);
+            registry.Add(@interface, unitOfWorkType);
 
             if (transactionalAttribute is not null)
             {
                 serviceCollection.Decorate(@interface,
-                    typeof(TransactionalDecorator<>).MakeGenericType(genericTypeArguments));
+                    typeof(TransactionalDecorator<,>).MakeGenericType(genericTypeArguments));
             }
         }
 

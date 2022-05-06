@@ -4,9 +4,7 @@ using ModU.Infrastructure.Database;
 
 namespace ModU.Infrastructure.Commands;
 
-
-
-public sealed class UnitOfWork<TDbContext> where TDbContext : BaseDbContext
+internal sealed class UnitOfWork<TDbContext> : IUnitOffWork where TDbContext : BaseDbContext
 {
     private readonly TDbContext _dbContext;
     private readonly ILogger<UnitOfWork<TDbContext>> _logger;
@@ -17,7 +15,7 @@ public sealed class UnitOfWork<TDbContext> where TDbContext : BaseDbContext
         _logger = logger;
     }
 
-    public async Task Execute<TCommand>(TCommand command, ICommandHandler<TCommand> commandHandler,
+    public async Task ExecuteAsync<TCommand>(TCommand command, ICommandHandler<TCommand> commandHandler,
         CancellationToken cancellationToken = new()) where TCommand : ICommand
     {
         _logger.LogInformation("Starting transaction for: '{CommandType}'.", typeof(TCommand));
@@ -34,5 +32,29 @@ public sealed class UnitOfWork<TDbContext> where TDbContext : BaseDbContext
             _logger.LogInformation("Rolled back transaction for: '{CommandType}'.", typeof(TCommand));
             throw;
         }
+    }
+
+    public async Task<TResult> ExecuteAsync<TCommand, TResult>(TCommand command,
+        ICommandHandler<TCommand, TResult> commandHandler,
+        CancellationToken cancellationToken = new()) where TCommand : ICommand<TResult>
+    {
+        TResult result;
+        _logger.LogInformation("Starting transaction for: '{CommandType}'.", typeof(TCommand));
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        
+        try
+        {
+            result = await commandHandler.HandleAsync(command, cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+            _logger.LogInformation("Committed transaction for: '{CommandType}'.", typeof(TCommand));
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            _logger.LogInformation("Rolled back transaction for: '{CommandType}'.", typeof(TCommand));
+            throw;
+        }
+
+        return result;
     }
 }

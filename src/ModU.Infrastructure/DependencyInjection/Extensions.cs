@@ -32,7 +32,7 @@ public static class Extensions
         var factory = ActivatorUtilities.CreateFactory(typeof(TDecorator), new[] {typeof(TService)});
 
         serviceCollection.Replace(ServiceDescriptor.Describe(typeof(TService),
-            s => (TService) factory(s, new[] {s.CreateInstance(serviceToWrap)}), serviceToWrap.Lifetime));
+            s => (TService) factory(s, new[] {s.CreateInstance(serviceToWrap)})!, serviceToWrap.Lifetime));
         
         return serviceCollection;
     }
@@ -46,6 +46,6 @@ public static class Extensions
 
         return serviceDescriptor.ImplementationFactory is not null 
             ? serviceDescriptor.ImplementationFactory(serviceProvider)
-            : ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, serviceDescriptor.ImplementationType);
+            : ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, serviceDescriptor.ImplementationType!);
     }
 }
