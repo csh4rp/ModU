@@ -17,7 +17,7 @@ public static class Extensions
             throw new InvalidOperationException($"Cannot register type: '{unitOfWorkType}' as context.");
         }
 
-        var registry = new UnitOfWorTypeRegistry();
+        var registry = new UnitOfWorkTypeRegistry();
         
         var handlerTypesWithoutResult = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
