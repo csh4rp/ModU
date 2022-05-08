@@ -2,7 +2,5 @@
 
 public interface ICommandProcessor
 {
-    Task ProcessAsync(ICommand command, CancellationToken cancellationToken = new());
-
-    Task<TResult> ProcessAsync<TResult>(ICommand<TResult> command, CancellationToken cancellationToken = new());
+    Task ProcessAsync<TCommand>(TCommand command, CancellationToken cancellationToken = new()) where TCommand : ICommand;
 }

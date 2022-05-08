@@ -19,13 +19,10 @@ public static class Extensions
 
         var registry = new UnitOfWorkTypeRegistry();
         
-        var handlerTypesWithoutResult = assembly.GetTypes()
+        var handlerTypes = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
 
-        var handlerTypesWithResult = assembly.GetTypes()
-            .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<,>)));
-
-        foreach (var type in handlerTypesWithoutResult)
+        foreach (var type in handlerTypes)
         {
             var @interface = type.GetInterfaces().Single();
             var genericTypeArgument = type.GetGenericArguments().Single();
@@ -37,21 +34,6 @@ public static class Extensions
             {
                 serviceCollection.Decorate(@interface,
                     typeof(TransactionalDecorator<>).MakeGenericType(genericTypeArgument));
-            }
-        }
-
-        foreach (var type in handlerTypesWithResult)
-        {
-            var @interface = type.GetInterfaces().Single();
-            var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
-            var genericTypeArguments = type.GetGenericArguments();
-            serviceCollection.AddTransient(@interface, type);
-            registry.Add(@interface, unitOfWorkType);
-
-            if (transactionalAttribute is not null)
-            {
-                serviceCollection.Decorate(@interface,
-                    typeof(TransactionalDecorator<,>).MakeGenericType(genericTypeArguments));
             }
         }
 

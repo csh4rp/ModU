@@ -26,9 +26,11 @@ internal sealed class CrudRepository<TEntity, TId, TDbContext> : ICrudRepository
         return _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = new()) => _dbContext.SaveChangesAsync(cancellationToken);
+    public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = new()) =>
+        _dbContext.SaveChangesAsync(cancellationToken);
 
-    public Task UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = new()) => _dbContext.SaveChangesAsync(cancellationToken);
+    public Task UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = new()) =>
+        _dbContext.SaveChangesAsync(cancellationToken);
 
     public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = new())
     {
@@ -43,10 +45,8 @@ internal sealed class CrudRepository<TEntity, TId, TDbContext> : ICrudRepository
     }
 
     public async Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = new())
-    {
-        return await _set.FindAsync(new object?[] { id }, cancellationToken);
-    }
-
+        => await _set.FindAsync(new object?[] { id }, cancellationToken);
+    
     public Task<TEntity?> GetBySpecificationAsync(QuerySpecification<TEntity> querySpecification,
         CancellationToken cancellationToken = new())
     {

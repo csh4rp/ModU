@@ -8,26 +8,22 @@ internal sealed class QueryProcessor : IQueryProcessor
     private static readonly ConcurrentDictionary<Type, object> Executors = new();
     private readonly IServiceProvider _serviceProvider;
 
-    public QueryProcessor(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    public QueryProcessor(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-    public Task<TResult> ProcessAsync<TResult>(IQuery<TResult> command, CancellationToken cancellationToken = new())
+    public Task<TResult> ProcessAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = new())
     {
-        var commandType = command.GetType();
+        var queryType = query.GetType();
         var resultType = typeof(TResult);
-        var handlerType = typeof(IQueryHandler<,>).MakeGenericType(commandType, resultType);
+        var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, resultType);
         var handler = _serviceProvider.GetService(handlerType);
         if (handler is null)
         {
-            throw new InvalidOperationException($"Handler for command of type '{commandType}' was not registered");
+            throw new InvalidOperationException($"Handler for query of type '{queryType}' was not registered.");
         }
-
-        var executorType = typeof(QueryHandlerExecutor<,>).MakeGenericType(commandType, resultType);
+        
+        var executorType = typeof(QueryHandlerExecutor<,>).MakeGenericType(queryType, resultType);
         var executor = (BaseQueryHandlerExecutor<TResult>) Executors.GetOrAdd(executorType, 
             t => (BaseQueryHandlerExecutor<TResult>)Activator.CreateInstance(t)!);
-        return executor.ExecuteHandlerAsync(handler, command, cancellationToken);
+        return executor.ExecuteHandlerAsync(handler, query, cancellationToken);
     }
-
 }

@@ -29,7 +29,7 @@ public class QueryProcessorTests
 
         // Act
         await Act(query);
-
+        
         // Assert
         await handlerMock.Received(1).HandleAsync(query);
     }
