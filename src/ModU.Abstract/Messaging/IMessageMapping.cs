@@ -1,6 +1,6 @@
 ﻿namespace ModU.Abstract.Messaging;
 
-public interface IMessageMapping<in TSource, out TDest> where TDest : IMessage
+public interface IMessageMapping<in TSource, out TDestination> where TDestination : IMessage
 {
-    TDest Map(TSource source);
+    TDestination Map(TSource source);
 }

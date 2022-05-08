@@ -1,6 +1,7 @@
-﻿namespace ModU.Abstract.Messaging;
+﻿using ModU.Abstract.Events;
 
-public interface IMessage
+namespace ModU.Abstract.Messaging;
+
+public interface IMessage : IEvent
 {
-    Guid Id { get; }
 }

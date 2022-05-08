@@ -1,29 +1,25 @@
-﻿using ModU.Abstract.Events;
-
-namespace ModU.Abstract.Domain;
+﻿namespace ModU.Abstract.Domain;
 
 public abstract class AggregateRoot : Entity
 {
-    private List<IDomainEvent>? _domainEvents;
+    private Queue<IDomainEvent>? _domainEvents;
 
-    public IReadOnlyCollection<IDomainEvent> DomainEvents
+    protected void EnqueueEvent(IDomainEvent domainEvent)
     {
-        get
-        {
-            if (_domainEvents is null)
-            {
-                return Array.Empty<IDomainEvent>();
-            }
+        _domainEvents ??= new Queue<IDomainEvent>();
+        _domainEvents.Enqueue(domainEvent);
+    }
 
-            return _domainEvents;
+    public IEnumerable<IDomainEvent> DequeueEvents()
+    {
+        if (_domainEvents is null)
+        {
+            yield break;
+        }
+        
+        while (_domainEvents.TryDequeue(out var domainEvent))
+        {
+            yield return domainEvent;
         }
     }
-
-    protected void AddEvent(IDomainEvent domainEvent)
-    {
-        _domainEvents ??= new List<IDomainEvent>();
-        _domainEvents.Add(domainEvent);
-    }
-
-    public void ClearEvents() => _domainEvents?.Clear();
 }
