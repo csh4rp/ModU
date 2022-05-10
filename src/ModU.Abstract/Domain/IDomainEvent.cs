@@ -1,8 +1,6 @@
-﻿using ModU.Abstract.Events;
+﻿namespace ModU.Abstract.Domain;
 
-namespace ModU.Abstract.Domain;
-
-public interface IDomainEvent : IEvent
+public interface IDomainEvent
 {
     
 }

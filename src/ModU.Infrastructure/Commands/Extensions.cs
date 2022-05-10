@@ -5,6 +5,7 @@ using ModU.Abstract.Commands.Attributes;
 using ModU.Infrastructure.Commands.Decorators;
 using ModU.Infrastructure.Database;
 using ModU.Infrastructure.DependencyInjection;
+using ModU.Infrastructure.Modules;
 
 namespace ModU.Infrastructure.Commands;
 
@@ -17,7 +18,7 @@ public static class Extensions
             throw new InvalidOperationException($"Cannot register type: '{unitOfWorkType}' as context.");
         }
 
-        var registry = new UnitOfWorkTypeRegistry();
+        var registry = new UnitOfWorkTypeRegistry(new ModuleNameResolver());
         
         var handlerTypes = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
