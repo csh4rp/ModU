@@ -2,7 +2,7 @@
 
 namespace ModU.Infrastructure.Modules;
 
-internal sealed class ModuleNameResolver : IModuleNameResolver
+internal sealed class ModuleNameResolver
 {
     public string Resolve(string typeFullName)
     {

@@ -1,13 +1,14 @@
 ﻿using ModU.Abstract.Modules;
+using ModU.Infrastructure.Modules;
 
 namespace ModU.Infrastructure.Commands;
 
 internal sealed class UnitOfWorkTypeRegistry
 {
     private static readonly Dictionary<string, Type> Registry = new();
-    private readonly IModuleNameResolver _moduleNameResolver;
+    private readonly ModuleNameResolver _moduleNameResolver;
 
-    public UnitOfWorkTypeRegistry(IModuleNameResolver moduleNameResolver) => _moduleNameResolver = moduleNameResolver;
+    public UnitOfWorkTypeRegistry(ModuleNameResolver moduleNameResolver) => _moduleNameResolver = moduleNameResolver;
 
     public void Add(Type handlerType, Type contextType)
     {
