@@ -18,7 +18,7 @@ public static class Extensions
             throw new InvalidOperationException($"Cannot register type: '{unitOfWorkType}' as context.");
         }
 
-        var registry = new UnitOfWorkTypeRegistry(new ModuleNameResolver());
+        ModuleTypeRegistry.Instance.AddUnitOfWork(unitOfWorkType);
         
         var handlerTypes = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
@@ -29,7 +29,6 @@ public static class Extensions
             var genericTypeArgument = type.GetGenericArguments().Single();
             var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
             serviceCollection.AddTransient(@interface, type);
-            registry.Add(@interface, unitOfWorkType);
 
             if (transactionalAttribute is not null)
             {
@@ -37,8 +36,6 @@ public static class Extensions
                     typeof(TransactionalDecorator<>).MakeGenericType(genericTypeArgument));
             }
         }
-
-        serviceCollection.AddSingleton(registry);
 
         return serviceCollection;
     }
