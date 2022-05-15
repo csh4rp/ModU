@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using ModU.Abstract.Database;
 using ModU.Infrastructure.Commands;
+using ModU.Infrastructure.Database;
 
 namespace ModU.Infrastructure.Modules;
 
@@ -18,10 +18,10 @@ internal sealed class ModuleServiceProvider
         return (IUnitOffWork) _serviceProvider.GetRequiredService(type);
     }
 
-    public IDbContext GetDbContextForType(Type typeFromModule)
+    public BaseDbContext GetDbContextForType(Type typeFromModule)
     {
         var moduleName = _moduleNameResolver.Resolve(typeFromModule.FullName!);
         var type = ModuleTypeRegistry.Instance.GetContextType(moduleName);
-        return (IDbContext) _serviceProvider.GetService(type);
+        return (BaseDbContext) _serviceProvider.GetRequiredService(type);
     }
 }

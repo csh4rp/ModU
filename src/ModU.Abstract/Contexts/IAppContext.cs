@@ -4,4 +4,5 @@ public interface IAppContext
 {
     IIdentityContext? IdentityContext { get; }
     ITenantContext TenantContext { get; }
+    ITraceContext TraceContext { get; }
 }
