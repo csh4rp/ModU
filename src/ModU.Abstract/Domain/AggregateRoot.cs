@@ -10,16 +10,21 @@ public abstract class AggregateRoot : Entity
         _domainEvents.Enqueue(domainEvent);
     }
 
-    public IEnumerable<IDomainEvent> DequeueEvents()
+    public DomainEventCollection DequeueEvents()
     {
-        if (_domainEvents is null)
+        if (_domainEvents is null || _domainEvents.Count == 0)
         {
-            yield break;
+            return new DomainEventCollection(ArraySegment<IDomainEvent>.Empty, Id, GetType());
         }
-        
+
+        var result = new IDomainEvent[_domainEvents.Count];
+        var index = 0;
         while (_domainEvents.TryDequeue(out var domainEvent))
         {
-            yield return domainEvent;
+            result[index] = domainEvent;
+            index++;
         }
+
+        return new DomainEventCollection(result, Id, GetType());
     }
 }
