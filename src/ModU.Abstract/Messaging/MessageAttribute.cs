@@ -3,12 +3,9 @@
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class MessageAttribute : Attribute
 {
-    public MessageAttribute(string name, string queueName)
-    {
-        Name = name;
-        QueueName = queueName;
-    }
+    public MessageAttribute(string name) => Name = name;
 
     public string Name { get; }
-    public string QueueName { get; }
+    public string? QueueName { get; set; }
+    public int MaxRetryAttempts { get; set; }
 }
