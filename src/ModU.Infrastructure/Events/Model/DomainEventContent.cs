@@ -1,14 +1,14 @@
 ﻿using System.Text.Json;
 
-namespace ModU.Infrastructure.Messaging.Model;
+namespace ModU.Infrastructure.Events.Model;
 
-public class OutboxMessageContent
+public sealed class DomainEventContent
 {
-    private OutboxMessageContent()
+    private DomainEventContent()
     {
     }
-
-    public OutboxMessageContent(string name, string type, JsonDocument data)
+    
+    public DomainEventContent(string name, string type, JsonDocument data)
     {
         Name = name;
         Type = type;
