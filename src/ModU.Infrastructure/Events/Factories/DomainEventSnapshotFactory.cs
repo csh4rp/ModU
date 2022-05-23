@@ -33,9 +33,8 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
             _appContext.IdentityContext?.UserId, transactionId,
             _appContext.TraceContext.TraceId, _appContext.TraceContext.SpanId);
 
-        var deliveryInfo = new DomainEventDeliveryInfo(_options.Value.MaxRetryAttempts);
-
         var type = domainEvent.GetType();
+        var deliveryInfo = new DomainEventDeliveryInfo(_options.Value.MaxRetryAttempts);
         var domainEventAttribute = type.GetCustomAttribute<DomainEventAttribute>();
         var content = new DomainEventContent(domainEventAttribute?.Name ?? type.Name, type.FullName!,
             JsonSerializer.SerializeToDocument(domainEvent));

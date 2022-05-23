@@ -18,5 +18,5 @@ public class TestDomainEvent : IDomainEvent
     }
 
     public Guid Id { get; private set; }
-    public List<int> Ids { get; private set; }
+    public List<int> Ids { get; private set; } = null!;
 }
