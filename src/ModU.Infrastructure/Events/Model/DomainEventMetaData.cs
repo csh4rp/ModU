@@ -21,8 +21,8 @@ public class DomainEventMetaData
 
     public DateTime CreatedAt { get; private set; }
     public Guid AggregateId { get; private set; }
-    public string AggregateType { get; private set; }
-    public string Queue { get; private set; }
+    public string AggregateType { get; private set; } = null!;
+    public string Queue { get; private set; } = null!;
     public Guid? UserId { get; private set; }
     public Guid TransactionId { get; private set; }
     public string TraceId { get; private set; } = null!;

@@ -1,6 +1,6 @@
 ﻿namespace ModU.Infrastructure.Events.Model;
 
-public class DomainEventSnapshot
+public sealed class DomainEventSnapshot
 {
     private DomainEventSnapshot()
     {
