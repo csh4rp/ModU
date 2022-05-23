@@ -25,7 +25,7 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
         _options = options;
     }
 
-    public DomainEventSnapshot Create(IDomainEvent domainEvent, Guid aggregateId, Type aggregateType, Guid? transactionId)
+    public DomainEventSnapshot Create<T>(T domainEvent, Guid aggregateId, Type aggregateType, Guid? transactionId) where T : IDomainEvent
     {
         var aggregateTypeName = aggregateType.FullName!;
         var queueName = GetQueueName(aggregateId, aggregateTypeName);
