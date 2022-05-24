@@ -6,10 +6,10 @@ namespace ModU.Infrastructure.Messaging.Stores;
 
 internal sealed class OutboxMessageStore : IOutboxMessageStore
 {
-    private readonly ModuleServiceProvider _moduleServiceProvider;
+    private readonly IModuleServiceProvider _moduleServiceProvider;
     private readonly IOutboxMessageFactory _outboxMessageFactory;
 
-    public OutboxMessageStore(ModuleServiceProvider moduleServiceProvider, IOutboxMessageFactory outboxMessageFactory)
+    public OutboxMessageStore(IModuleServiceProvider moduleServiceProvider, IOutboxMessageFactory outboxMessageFactory)
     {
         _moduleServiceProvider = moduleServiceProvider;
         _outboxMessageFactory = outboxMessageFactory;
@@ -24,11 +24,12 @@ internal sealed class OutboxMessageStore : IOutboxMessageStore
         return context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task SaveAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = new CancellationToken())
+    public Task SaveAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = new())
     {
-        var context = _moduleServiceProvider.GetDbContextForType(messages.First().GetType());
+        var messagesCollection = messages as IReadOnlyCollection<IMessage> ?? messages.ToList();
+        var context = _moduleServiceProvider.GetDbContextForType(messagesCollection.First().GetType());
         var transactionId = context.Database.CurrentTransaction?.TransactionId;
-        var outboxMessages = messages.Select(m => _outboxMessageFactory.Create(m, transactionId));
+        var outboxMessages = messagesCollection.Select(m => _outboxMessageFactory.Create(m, transactionId));
 
         context.AddRange(outboxMessages);
         return context.SaveChangesAsync(cancellationToken);

@@ -4,7 +4,7 @@ using ModU.Infrastructure.Database;
 
 namespace ModU.Infrastructure.Modules;
 
-internal sealed class ModuleServiceProvider
+internal sealed class ModuleServiceProvider : IModuleServiceProvider
 {
     private readonly ModuleNameResolver _moduleNameResolver = new();
     private readonly IServiceProvider _serviceProvider;

@@ -6,9 +6,9 @@ namespace ModU.Infrastructure.Commands.Decorators;
 internal sealed class TransactionalDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
 {
     private readonly ICommandHandler<TCommand> _handler;
-    private readonly ModuleServiceProvider _moduleServiceProvider;
+    private readonly IModuleServiceProvider _moduleServiceProvider;
 
-    public TransactionalDecorator(ICommandHandler<TCommand> handler, ModuleServiceProvider moduleServiceProvider)
+    public TransactionalDecorator(ICommandHandler<TCommand> handler, IModuleServiceProvider moduleServiceProvider)
     {
         _handler = handler;
         _moduleServiceProvider = moduleServiceProvider;

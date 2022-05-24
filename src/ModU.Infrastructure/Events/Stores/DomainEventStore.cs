@@ -6,10 +6,10 @@ namespace ModU.Infrastructure.Events.Stores;
 
 internal sealed class DomainEventStore : IDomainEventStore
 {
-    private readonly ModuleServiceProvider _serviceProvider;
+    private readonly IModuleServiceProvider _serviceProvider;
     private readonly IDomainEventSnapshotFactory _domainEventSnapshotFactory;
     
-    public DomainEventStore(ModuleServiceProvider serviceProvider, IDomainEventSnapshotFactory domainEventSnapshotFactory)
+    public DomainEventStore(IModuleServiceProvider serviceProvider, IDomainEventSnapshotFactory domainEventSnapshotFactory)
     {
         _serviceProvider = serviceProvider;
         _domainEventSnapshotFactory = domainEventSnapshotFactory;
