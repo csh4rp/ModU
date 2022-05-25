@@ -8,7 +8,7 @@ internal sealed class CommandProcessor : ICommandProcessor
 
     public CommandProcessor(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-    public Task ProcessAsync<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : ICommand
+    public Task ProcessAsync<TCommand>(TCommand command, CancellationToken cancellationToken = new()) where TCommand : ICommand
     {
         if (_serviceProvider.GetService(typeof(ICommandHandler<TCommand>)) is not ICommandHandler<TCommand> handler)
         {

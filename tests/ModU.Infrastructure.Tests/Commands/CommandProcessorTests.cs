@@ -45,5 +45,5 @@ public class CommandProcessorTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => Act(command));
     }
 
-    private Task Act(ICommand command) => _commandProcessor.ProcessAsync(command);
+    private Task Act(TestCommand command) => _commandProcessor.ProcessAsync(command);
 }
