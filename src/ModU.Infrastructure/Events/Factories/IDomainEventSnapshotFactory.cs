@@ -1,5 +1,5 @@
 ﻿using ModU.Abstract.Domain;
-using ModU.Infrastructure.Events.Model;
+using ModU.Infrastructure.Events.Entities;
 
 namespace ModU.Infrastructure.Events.Factories;
 

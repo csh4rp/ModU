@@ -3,10 +3,10 @@ using ModU.Abstract.Contexts;
 using ModU.Abstract.Domain;
 using ModU.Abstract.Security;
 using ModU.Abstract.Time;
-using ModU.Infrastructure.Events.Model;
 using ModU.Infrastructure.Events.Options;
 using System.Reflection;
 using System.Text.Json;
+using ModU.Infrastructure.Events.Entities;
 
 namespace ModU.Infrastructure.Events.Factories;
 

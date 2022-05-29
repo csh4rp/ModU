@@ -1,4 +1,4 @@
-﻿namespace ModU.Infrastructure.Events.Model;
+﻿namespace ModU.Infrastructure.Events.Entities;
 
 public sealed class DomainEventSnapshot
 {
@@ -18,4 +18,9 @@ public sealed class DomainEventSnapshot
     public DomainEventMetaData MetaData { get; private set; } = null!;
     public DomainEventDeliveryInfo DeliveryInfo { get; private set; } = null!;
     public DomainEventContent Content { get; private set; } = null!;
+
+    public void MarkAsDelivered(DateTime deliveredAt)
+    {
+
+    }
 }

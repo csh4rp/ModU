@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace ModU.Infrastructure.Events.Model;
+namespace ModU.Infrastructure.Events.Entities;
 
 public sealed class DomainEventContent
 {

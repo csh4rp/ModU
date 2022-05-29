@@ -1,4 +1,4 @@
-﻿namespace ModU.Infrastructure.Events.Model;
+﻿namespace ModU.Infrastructure.Events.Entities;
 
 public class DomainEventMetaData
 {
