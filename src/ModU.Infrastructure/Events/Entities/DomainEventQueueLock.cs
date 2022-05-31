@@ -2,7 +2,7 @@
 
 public class DomainEventQueueLock
 {
-    public DomainEventQueueLock()
+    private DomainEventQueueLock()
     {
     }
     
@@ -14,6 +14,7 @@ public class DomainEventQueueLock
     }
 
     public string Id { get; private set; } = null!;
+    public int Version { get; private set; }
     public DateTime AcquiredAt { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime? RenewedAt { get; private set; }

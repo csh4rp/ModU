@@ -29,17 +29,25 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
     {
         var aggregateTypeName = aggregateType.FullName!;
         var queueName = GetQueueName(aggregateId, aggregateTypeName);
-        var metaData = new DomainEventMetaData(_clock.Now(), aggregateId, aggregateTypeName, queueName,
-            _appContext.IdentityContext?.UserId, transactionId,
-            _appContext.TraceContext.TraceId, _appContext.TraceContext.SpanId);
-
         var type = domainEvent.GetType();
-        var deliveryInfo = new DomainEventDeliveryInfo(_options.Value.MaxRetryAttempts);
         var domainEventAttribute = type.GetCustomAttribute<DomainEventAttribute>();
-        var content = new DomainEventContent(domainEventAttribute?.Name ?? type.Name, type.FullName!,
-            JsonSerializer.SerializeToDocument(domainEvent));
 
-        return new DomainEventSnapshot(Guid.NewGuid(), metaData, deliveryInfo, content);
+        return new DomainEventSnapshot
+        {
+            Id = Guid.NewGuid(),
+            CreatedAt = _clock.Now(),
+            AggregateId = aggregateId,
+            AggregateType = aggregateTypeName,
+            Queue = queueName,
+            UserId = _appContext.IdentityContext?.UserId,
+            TransactionId = transactionId,
+            TraceId = _appContext.TraceContext.TraceId,
+            SpanId = _appContext.TraceContext.SpanId,
+            MaxAttempts = _options.Value.MaxRetryAttempts,
+            Name = domainEventAttribute?.Name ?? type.Name,
+            Type = type.FullName!,
+            Data = JsonSerializer.SerializeToDocument(domainEvent)
+        };
     }
 
     private string GetQueueName(Guid aggregateId, string aggregateType) 

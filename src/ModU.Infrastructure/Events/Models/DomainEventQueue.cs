@@ -10,84 +10,99 @@ using ModU.Infrastructure.Events.Options;
 
 namespace ModU.Infrastructure.Events.Models;
 
-public class DomainEventQueue : IDomainEventQueue
+public sealed class DomainEventQueue : IDomainEventQueue
 {
+    private readonly Dictionary<IDomainEvent, DomainEventSnapshot> _events = new();
+    private readonly List<DomainEventSnapshot> _snapshots = new();
     private readonly BaseDbContext _dbContext;
     private readonly IClock _clock;
     private readonly IDomainEventFactory _domainEventFactory;
     private readonly IOptions<DomainEventOptions> _options;
+    private readonly DomainEventQueueLock _domainEventQueueLock;
 
-    private DomainEventQueueLock? _domainEventQueueLock;
-    private Dictionary<IDomainEvent, DomainEventSnapshot> _events = new();
-
-
-    public ValueTask DisposeAsync()
+    public DomainEventQueue(BaseDbContext dbContext, IClock clock, IDomainEventFactory domainEventFactory,
+        IOptions<DomainEventOptions> options, string id)
     {
-        return new ValueTask();
+        _dbContext = dbContext;
+        _clock = clock;
+        _domainEventFactory = domainEventFactory;
+        _options = options;
+        Id = id;
     }
 
     public string Id { get; }
 
-    public async Task<bool> TryAcquireLockAsync(CancellationToken cancellationToken = new())
+    public async ValueTask DisposeAsync()
     {
-        var now = _clock.Now();
-        var expiresAt = now.AddMilliseconds(_options.Value.QueueLockTime);
-        _domainEventQueueLock = await _dbContext.Set<DomainEventQueueLock>().FirstOrDefaultAsync(l => l.Id == Id, cancellationToken);
-        if (_domainEventQueueLock is null)
-        {
-            _domainEventQueueLock = new DomainEventQueueLock(Id, _clock.Now(), expiresAt);
-            _dbContext.Set<DomainEventQueueLock>().Add(_domainEventQueueLock);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            return true;
-        }
 
-        if (_domainEventQueueLock.ExpiresAt > now)
-        {
-            return false;
-        }
-        
-        _domainEventQueueLock.Renew(now, expiresAt);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return true;
     }
-
+    
     public async IAsyncEnumerable<IDomainEvent> GetEventsAsync([EnumeratorCancellation] CancellationToken cancellationToken = new())
     {
         if (_domainEventQueueLock is null)
         {
             throw new InvalidOperationException("A lock has to be acquired before events can be fetched.");
         }
-        
-        var batchNumber = 0;
-        var events = await GetBatchAsync(batchNumber, cancellationToken);
-        while (events.Any() && _domainEventQueueLock.ExpiresAt < _clock.Now() && !cancellationToken.IsCancellationRequested)
+
+        var batchIndex = 0;
+        var events = await GetBatchAsync(batchIndex, cancellationToken);
+        while (events.Any())
         {
             foreach (var domainEventSnapshot in events)
             {
+                if (ShouldOperationBeCancelled(cancellationToken))
+                {
+                    yield break;
+                }
+                
                 var domainEvent = _domainEventFactory.Create(domainEventSnapshot);
                 _events.Add(domainEvent, domainEventSnapshot);
                 yield return domainEvent;
             }
             
-            events = await GetBatchAsync(batchNumber++, cancellationToken);
+            events = await GetBatchAsync(batchIndex++, cancellationToken);
         }
     }
 
-    private Task<List<DomainEventSnapshot>> GetBatchAsync(int batchNumber, CancellationToken cancellationToken)
+    private bool ShouldOperationBeCancelled(CancellationToken cancellationToken)
+        => cancellationToken.IsCancellationRequested || _domainEventQueueLock.ExpiresAt < _clock.Now();
+    
+    private Task<List<DomainEventSnapshot>> GetBatchAsync(int batchIndex, CancellationToken cancellationToken)
     {
-        const int batchSize = 10;
+        const int batchSize = 50;
         return _dbContext.Set<DomainEventSnapshot>()
-            .Where(d => d.MetaData.Queue == Id)
-            .OrderBy(d => d.MetaData.CreatedAt)
-            .Skip(batchNumber * batchSize)
+            .Where(d => d.Queue == Id && !d.FailedAt.HasValue)
+            .OrderBy(d => d.CreatedAt)
+            .Skip(batchIndex * batchSize)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }
 
-    public Task MarkAsPublishedAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = new())
+    public async ValueTask MarkAsDeliveredAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = new())
     {
-        return Task.CompletedTask;
+        var snapshot = _events[domainEvent];
+        snapshot.MarkAsDelivered(_clock.Now());
+        if (_options.Value.UseBatching)
+        {
+            _snapshots.Add(snapshot);
+        }
+        else
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 
-    public Task MarkAsFailedAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = new()) => throw new NotImplementedException();
+    public async ValueTask MarkAsFailedAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = new())
+    {
+        var snapshot = _events[domainEvent];
+        snapshot.AttemptFailed(_clock.Now().AddSeconds(snapshot.FailedAttempts * 5));
+        if (_options.Value.UseBatching)
+        {
+            _snapshots.Add(snapshot);
+        }
+        else
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
 }

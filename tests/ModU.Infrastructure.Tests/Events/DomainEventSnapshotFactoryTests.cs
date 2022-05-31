@@ -55,24 +55,24 @@ public class DomainEventSnapshotFactoryTests
         // Asser
         snapshot.ShouldNotBeNull();
         snapshot.Id.ShouldNotBe(Guid.Empty);
-        snapshot.Content.Name.ShouldBe("test_domain_event");
-        snapshot.Content.Type.ShouldBe(typeof(TestDomainEvent).FullName);
-        snapshot.Content.Data.RootElement.ToString().ShouldBeEquivalentTo(JsonSerializer.Serialize(domainEvent));
+        snapshot.Name.ShouldBe("test_domain_event");
+        snapshot.Type.ShouldBe(typeof(TestDomainEvent).FullName);
+        snapshot.Data.RootElement.ToString().ShouldBeEquivalentTo(JsonSerializer.Serialize(domainEvent));
         
-        snapshot.DeliveryInfo.AttemptNumber.ShouldBe(0);
-        snapshot.DeliveryInfo.MaxAttempts.ShouldBe(maxRetryAttempts);
-        snapshot.DeliveryInfo.DeliveredAt.ShouldBeNull();
-        snapshot.DeliveryInfo.FailedAt.ShouldBeNull();
-        snapshot.DeliveryInfo.NextAttemptAt.ShouldBeNull();
+        snapshot.FailedAttempts.ShouldBe(0);
+        snapshot.MaxAttempts.ShouldBe(maxRetryAttempts);
+        snapshot.DeliveredAt.ShouldBeNull();
+        snapshot.FailedAt.ShouldBeNull();
+        snapshot.NextAttemptAt.ShouldBeNull();
 
-        snapshot.MetaData.Queue.ShouldBe(hash);
-        snapshot.MetaData.TraceId.ShouldBe(_appContext.TraceContext.TraceId);
-        snapshot.MetaData.SpanId.ShouldBe(_appContext.TraceContext.SpanId);
-        snapshot.MetaData.AggregateId.ShouldBe(aggregateId);
-        snapshot.MetaData.AggregateType.ShouldBe(aggregateType.FullName);
-        snapshot.MetaData.CreatedAt.ShouldBe(_clock.Now());
-        snapshot.MetaData.TransactionId.ShouldBe(transactionId);
-        snapshot.MetaData.UserId.ShouldBe(_appContext.IdentityContext.UserId);
+        snapshot.Queue.ShouldBe(hash);
+        snapshot.TraceId.ShouldBe(_appContext.TraceContext.TraceId);
+        snapshot.SpanId.ShouldBe(_appContext.TraceContext.SpanId);
+        snapshot.AggregateId.ShouldBe(aggregateId);
+        snapshot.AggregateType.ShouldBe(aggregateType.FullName);
+        snapshot.CreatedAt.ShouldBe(_clock.Now());
+        snapshot.TransactionId.ShouldBe(transactionId);
+        snapshot.UserId.ShouldBe(_appContext.IdentityContext.UserId);
     }
 
     private DomainEventSnapshot Act(TestDomainEvent @event, Guid aggregateId, Type aggregateType, Guid transactionId) 

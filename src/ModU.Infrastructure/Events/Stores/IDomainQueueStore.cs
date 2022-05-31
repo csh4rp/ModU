@@ -1,6 +1,8 @@
-﻿namespace ModU.Infrastructure.Events.Stores;
+﻿using ModU.Infrastructure.Events.Models;
+
+namespace ModU.Infrastructure.Events.Stores;
 
 public interface IDomainQueueStore
 {
-    Task<IReadOnlyCollection<IDomainQueueStore>> GetQueuesToProcessAsync(CancellationToken cancellationToken = new());
+    Task<IAsyncEnumerable<IDomainEventQueue>> GetQueuesToProcessAsync(CancellationToken cancellationToken = new());
 }
