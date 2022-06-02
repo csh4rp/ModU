@@ -1,15 +1,11 @@
-﻿using ModU.Abstract.Domain;
-using ModU.Infrastructure.Events.Entities;
+﻿using ModU.Infrastructure.Events.Entities;
 
 namespace ModU.Infrastructure.Events.Models;
 
-public interface IDomainEventQueue : IAsyncDisposable
+public interface IDomainEventQueue
 {
     string Id { get; }
-    
-    IAsyncEnumerable<IDomainEvent> GetEventsAsync(CancellationToken cancellationToken = new());
 
-    ValueTask MarkAsDeliveredAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = new());
+    bool TryDequeue(out DomainEventSnapshot? domainEventSnapshot);
 
-    ValueTask MarkAsFailedAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = new());
 }

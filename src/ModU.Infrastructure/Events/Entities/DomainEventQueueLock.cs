@@ -19,6 +19,8 @@ public class DomainEventQueueLock
     public DateTime ExpiresAt { get; private set; }
     public DateTime? RenewedAt { get; private set; }
 
+    public bool HasExpired => ExpiresAt < DateTime.UtcNow;
+
     public void Renew(DateTime renewedAt, DateTime expiredAt)
     {
         RenewedAt = renewedAt;
