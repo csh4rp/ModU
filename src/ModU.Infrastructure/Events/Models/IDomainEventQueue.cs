@@ -2,10 +2,7 @@
 
 namespace ModU.Infrastructure.Events.Models;
 
-public interface IDomainEventQueue
+public interface IDomainEventQueue : IAsyncDisposable
 {
-    string Id { get; }
-
-    bool TryDequeue(out DomainEventSnapshot? domainEventSnapshot);
-
+    IAsyncEnumerable<DomainEventSnapshot> DequeueAsync(CancellationToken cancellationToken = new());
 }
