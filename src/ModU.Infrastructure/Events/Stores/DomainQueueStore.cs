@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using ModU.Abstract.Time;
 using ModU.Infrastructure.Events.Models;
 
 namespace ModU.Infrastructure.Events.Stores;
@@ -5,9 +7,16 @@ namespace ModU.Infrastructure.Events.Stores;
 public class DomainQueueStore : IDomainQueueStore
 {
     private readonly IDomainEventQueueLockStore _domainEventQueueLockStore;
-
-    public async IAsyncEnumerable<IDomainEventQueue> GetQueuesToProcessAsync(CancellationToken cancellationToken = new())
+    private readonly IDomainEventSnapshotStore _domainEventSnapshotStore;
+    private readonly IClock _clock;
+    public async IAsyncEnumerable<IDomainEventQueue> GetQueuesToProcessAsync([EnumeratorCancellation] CancellationToken cancellationToken = new())
     {
+        var queues = await _domainEventSnapshotStore.GetQueuesToBeProcessed(cancellationToken);
+        foreach (var queue in queues)
+        {
+            yield return new DomainEventQueue(queue, _domainEventQueueLockStore, _domainEventSnapshotStore, _clock);
+        }
+        
         yield break;
     }
 

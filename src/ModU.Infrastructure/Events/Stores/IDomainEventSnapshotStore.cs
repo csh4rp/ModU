@@ -9,4 +9,6 @@ public interface IDomainEventSnapshotStore
     Task SaveAsync(IEnumerable<DomainEventSnapshot> snapshots, CancellationToken cancellationToken = new());
 
     Task<List<DomainEventSnapshot>> GetUndeliveredAsync(string queue, CancellationToken cancellationToken = new());
+
+    Task<List<string>> GetQueuesToBeProcessed(CancellationToken cancellationToken = new());
 }
