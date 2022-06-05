@@ -1,27 +1,32 @@
 using Microsoft.Extensions.DependencyInjection;
+using ModU.Abstract.Modules;
 using ModU.Infrastructure.Commands;
 using ModU.Infrastructure.Database;
+using ModU.Infrastructure.Events.Stores;
 
 namespace ModU.Infrastructure.Modules;
 
 internal sealed class ModuleServiceProvider : IModuleServiceProvider
 {
-    private readonly ModuleNameResolver _moduleNameResolver = new();
     private readonly IServiceProvider _serviceProvider;
 
     public ModuleServiceProvider(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
-    public IUnitOffWork GetUnitOfWorkForType(Type typeFromModule)
+    public IUnitOfWork GetUnitOfWorkForModule(IModule module)
     {
-        var moduleName = _moduleNameResolver.Resolve(typeFromModule.FullName!);
-        var type = ModuleTypeRegistry.Instance.GetUnitOfWorkType(moduleName);
-        return (IUnitOffWork) _serviceProvider.GetRequiredService(type);
+        var type = ModuleTypeRegistry.Instance.GetUnitOfWorkType(module.Name);
+        return (IUnitOfWork) _serviceProvider.GetRequiredService(type);
     }
 
-    public BaseDbContext GetDbContextForType(Type typeFromModule)
+    public BaseDbContext GetDbContextForModule(IModule module)
     {
-        var moduleName = _moduleNameResolver.Resolve(typeFromModule.FullName!);
-        var type = ModuleTypeRegistry.Instance.GetContextType(moduleName);
+        var type = ModuleTypeRegistry.Instance.GetContextType(module.Name);
         return (BaseDbContext) _serviceProvider.GetRequiredService(type);
+    }
+
+    public IDomainQueueStore GetDomainQueueStoreForModule(IModule module)
+    {
+        var dbContext = GetDbContextForModule(module);
+        return null;
     }
 }

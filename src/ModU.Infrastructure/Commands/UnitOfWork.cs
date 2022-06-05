@@ -4,7 +4,7 @@ using ModU.Infrastructure.Database;
 
 namespace ModU.Infrastructure.Commands;
 
-internal sealed class UnitOfWork<TDbContext> : IUnitOffWork where TDbContext : BaseDbContext
+internal sealed class UnitOfWork<TDbContext> : IUnitOfWork where TDbContext : BaseDbContext
 {
     private readonly TDbContext _dbContext;
     private readonly ILogger<UnitOfWork<TDbContext>> _logger;

@@ -1,11 +1,15 @@
+using ModU.Abstract.Modules;
 using ModU.Infrastructure.Commands;
 using ModU.Infrastructure.Database;
+using ModU.Infrastructure.Events.Stores;
 
 namespace ModU.Infrastructure.Modules;
 
 internal interface IModuleServiceProvider
 {
-    IUnitOffWork GetUnitOfWorkForType(Type typeFromModule);
+    IUnitOfWork GetUnitOfWorkForModule(IModule module);
 
-    BaseDbContext GetDbContextForType(Type typeFromModule);
+    BaseDbContext GetDbContextForModule(IModule module);
+
+    IDomainQueueStore GetDomainQueueStoreForModule(IModule module);
 }

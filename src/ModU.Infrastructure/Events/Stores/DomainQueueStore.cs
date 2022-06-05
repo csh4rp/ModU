@@ -4,24 +4,35 @@ using ModU.Infrastructure.Events.Models;
 
 namespace ModU.Infrastructure.Events.Stores;
 
-public class DomainQueueStore : IDomainQueueStore
+internal sealed class DomainQueueStore : IDomainQueueStore
 {
     private readonly IDomainEventQueueLockStore _domainEventQueueLockStore;
     private readonly IDomainEventSnapshotStore _domainEventSnapshotStore;
     private readonly IClock _clock;
+
+    public DomainQueueStore(IDomainEventQueueLockStore domainEventQueueLockStore, IDomainEventSnapshotStore domainEventSnapshotStore, IClock clock)
+    {
+        _domainEventQueueLockStore = domainEventQueueLockStore;
+        _domainEventSnapshotStore = domainEventSnapshotStore;
+        _clock = clock;
+    }
+
     public async IAsyncEnumerable<IDomainEventQueue> GetQueuesToProcessAsync([EnumeratorCancellation] CancellationToken cancellationToken = new())
     {
         var queues = await _domainEventSnapshotStore.GetQueuesToBeProcessed(cancellationToken);
-        foreach (var queue in queues)
+        while (queues.Any())
         {
-            yield return new DomainEventQueue(queue, _domainEventQueueLockStore, _domainEventSnapshotStore, _clock);
-        }
-        
-        yield break;
-    }
+            foreach (var queue in queues)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+                
+                yield return new DomainEventQueue(queue, _domainEventQueueLockStore, _domainEventSnapshotStore, _clock);
+            }
 
-    public Task ReleaseAsync(IDomainEventQueue queue, CancellationToken cancellationToken = new CancellationToken())
-    {
-        throw new NotImplementedException();
+            queues = await _domainEventSnapshotStore.GetQueuesToBeProcessed(cancellationToken);
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using ModU.Abstract.Modules;
-
-namespace ModU.Infrastructure.Modules;
+﻿namespace ModU.Infrastructure.Modules;
 
 internal sealed class ModuleNameResolver
 {

@@ -5,7 +5,7 @@ using ModU.Infrastructure.Events.Stores;
 
 namespace ModU.Infrastructure.Events.Models;
 
-public sealed class DomainEventQueue : IDomainEventQueue
+internal sealed class DomainEventQueue : IDomainEventQueue
 {
     private readonly string _id;
     private readonly IDomainEventQueueLockStore _queueLockStore;
@@ -32,8 +32,13 @@ public sealed class DomainEventQueue : IDomainEventQueue
         var events = await _domainEventSnapshotStore.GetUndeliveredAsync(_id, cancellationToken);
         while (events.Any() && !cancellationToken.IsCancellationRequested)
         {
-            foreach (var snapshot in events.TakeWhile(_ => !cancellationToken.IsCancellationRequested))
+            foreach (var snapshot in events)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+                
                 if (_lock!.ExpiresAt < _clock.Now() && !await TryRenewLockAsync(cancellationToken))
                 {
                     yield break;
@@ -80,7 +85,6 @@ public sealed class DomainEventQueue : IDomainEventQueue
             return false;
         }
     }
-
 
     public async ValueTask DisposeAsync()
     {

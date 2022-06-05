@@ -10,5 +10,5 @@ public interface IDomainEventSnapshotStore
 
     Task<List<DomainEventSnapshot>> GetUndeliveredAsync(string queue, CancellationToken cancellationToken = new());
 
-    Task<List<string>> GetQueuesToBeProcessed(CancellationToken cancellationToken = new());
+    Task<IReadOnlySet<string>> GetQueuesToBeProcessed(CancellationToken cancellationToken = new());
 }

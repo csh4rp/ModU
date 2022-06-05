@@ -7,16 +7,19 @@ internal sealed class TransactionalDecorator<TCommand> : ICommandHandler<TComman
 {
     private readonly ICommandHandler<TCommand> _handler;
     private readonly IModuleServiceProvider _moduleServiceProvider;
+    private readonly IModuleResolver _moduleResolver;
 
-    public TransactionalDecorator(ICommandHandler<TCommand> handler, IModuleServiceProvider moduleServiceProvider)
+    public TransactionalDecorator(ICommandHandler<TCommand> handler, IModuleServiceProvider moduleServiceProvider, IModuleResolver moduleResolver)
     {
         _handler = handler;
         _moduleServiceProvider = moduleServiceProvider;
+        _moduleResolver = moduleResolver;
     }
 
     public Task HandleAsync(TCommand command, CancellationToken cancellationToken = new())
     {
-        var unitOfWork = _moduleServiceProvider.GetUnitOfWorkForType(typeof(TCommand));
+        var module = _moduleResolver.ResolveForType(typeof(TCommand));
+        var unitOfWork = _moduleServiceProvider.GetUnitOfWorkForModule(module);
         return unitOfWork.ExecuteAsync(command, _handler, cancellationToken);
     }
 }
