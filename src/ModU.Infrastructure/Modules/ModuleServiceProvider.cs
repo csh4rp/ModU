@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using ModU.Abstract.Modules;
+using ModU.Abstract.Time;
 using ModU.Infrastructure.Commands;
 using ModU.Infrastructure.Database;
 using ModU.Infrastructure.Events.Stores;
@@ -9,8 +10,13 @@ namespace ModU.Infrastructure.Modules;
 internal sealed class ModuleServiceProvider : IModuleServiceProvider
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IClock _clock;
 
-    public ModuleServiceProvider(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+    public ModuleServiceProvider(IServiceProvider serviceProvider, IClock clock)
+    {
+        _serviceProvider = serviceProvider;
+        _clock = clock;
+    }
 
     public IUnitOfWork GetUnitOfWorkForModule(IModule module)
     {
@@ -27,6 +33,8 @@ internal sealed class ModuleServiceProvider : IModuleServiceProvider
     public IDomainQueueStore GetDomainQueueStoreForModule(IModule module)
     {
         var dbContext = GetDbContextForModule(module);
-        return null;
+        var snapshotStore = new DomainEventSnapshotStore(dbContext, _clock);
+        var lockStore = new DomainEventQueueLockStore(dbContext);
+        return new DomainQueueStore(lockStore, snapshotStore, _clock);
     }
 }
