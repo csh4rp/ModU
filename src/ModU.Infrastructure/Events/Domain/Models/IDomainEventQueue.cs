@@ -1,6 +1,6 @@
-﻿using ModU.Infrastructure.Events.Entities;
+﻿using ModU.Infrastructure.Events.Domain.Entities;
 
-namespace ModU.Infrastructure.Events.Models;
+namespace ModU.Infrastructure.Events.Domain.Models;
 
 public interface IDomainEventQueue : IAsyncDisposable
 {

@@ -14,4 +14,10 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Commands\Decorators" />
+      <Folder Include="Events\Domain" />
+      <Folder Include="Modules" />
+    </ItemGroup>
+
 </Project>

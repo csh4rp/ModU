@@ -1,6 +1,6 @@
-﻿using ModU.Infrastructure.Events.Models;
+﻿using ModU.Infrastructure.Events.Domain.Models;
 
-namespace ModU.Infrastructure.Events.Stores;
+namespace ModU.Infrastructure.Events.Domain.Stores;
 
 public interface IDomainQueueStore
 {

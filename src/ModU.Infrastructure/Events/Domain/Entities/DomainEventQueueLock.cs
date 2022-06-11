@@ -1,4 +1,4 @@
-﻿namespace ModU.Infrastructure.Events.Entities;
+﻿namespace ModU.Infrastructure.Events.Domain.Entities;
 
 public class DomainEventQueueLock
 {
@@ -18,8 +18,6 @@ public class DomainEventQueueLock
     public DateTime AcquiredAt { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime? RenewedAt { get; private set; }
-
-    public bool HasExpired => ExpiresAt < DateTime.UtcNow;
 
     public void Renew(DateTime renewedAt, DateTime expiredAt)
     {

@@ -5,9 +5,9 @@ using Microsoft.Extensions.Options;
 using ModU.Abstract.Contexts;
 using ModU.Abstract.Security;
 using ModU.Abstract.Time;
-using ModU.Infrastructure.Events.Entities;
-using ModU.Infrastructure.Events.Factories;
-using ModU.Infrastructure.Events.Options;
+using ModU.Infrastructure.Events.Domain.Entities;
+using ModU.Infrastructure.Events.Domain.Factories;
+using ModU.Infrastructure.Events.Domain.Options;
 using ModU.Infrastructure.Tests.Events.TestData;
 using NSubstitute;
 using Shouldly;
@@ -46,13 +46,13 @@ public class DomainEventSnapshotFactoryTests
         _appContext.IdentityContext!.UserId.Returns(Guid.NewGuid());
         _appContext.TraceContext.TraceId.Returns(Guid.NewGuid().ToString());
         _appContext.TraceContext.SpanId.Returns(Guid.NewGuid().ToString());
-        _options.Value.Returns(new DomainEventOptions { MaxRetryAttempts = maxRetryAttempts });
+        _options.Value.Returns(new DomainEventOptions {  });
         var domainEvent = ADomainEvent();
         
         // Act
         var snapshot = Act(domainEvent, aggregateId, aggregateType,transactionId);
 
-        // Asser
+        // Assert
         snapshot.ShouldNotBeNull();
         snapshot.Id.ShouldNotBe(Guid.Empty);
         snapshot.Name.ShouldBe("test_domain_event");

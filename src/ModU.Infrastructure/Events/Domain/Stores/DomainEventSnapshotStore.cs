@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ModU.Abstract.Time;
 using ModU.Infrastructure.Database;
-using ModU.Infrastructure.Events.Entities;
+using ModU.Infrastructure.Events.Domain.Entities;
 
-namespace ModU.Infrastructure.Events.Stores;
+namespace ModU.Infrastructure.Events.Domain.Stores;
 
 internal sealed class DomainEventSnapshotStore : IDomainEventSnapshotStore
 {

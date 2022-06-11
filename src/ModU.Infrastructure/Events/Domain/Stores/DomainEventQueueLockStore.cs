@@ -1,17 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using ModU.Infrastructure.Database;
-using ModU.Infrastructure.Events.Entities;
+using ModU.Infrastructure.Events.Domain.Entities;
 
-namespace ModU.Infrastructure.Events.Stores;
+namespace ModU.Infrastructure.Events.Domain.Stores;
 
 internal sealed class DomainEventQueueLockStore : IDomainEventQueueLockStore
 {
     private readonly BaseDbContext _dbContext;
 
-    public DomainEventQueueLockStore(BaseDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public DomainEventQueueLockStore(BaseDbContext dbContext) => _dbContext = dbContext;
 
     public Task SaveAsync(DomainEventQueueLock domainEventQueueLock,
         CancellationToken cancellationToken = new())
@@ -24,7 +21,6 @@ internal sealed class DomainEventQueueLockStore : IDomainEventQueueLockStore
         => _dbContext.Set<DomainEventQueueLock>()
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
     
-
     public Task DeleteAsync(DomainEventQueueLock domainEventQueueLock, CancellationToken cancellationToken = new())
     {
         _dbContext.Remove(domainEventQueueLock);

@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using ModU.Abstract.Time;
-using ModU.Infrastructure.Events.Models;
+using ModU.Infrastructure.Events.Domain.Models;
 
-namespace ModU.Infrastructure.Events.Stores;
+namespace ModU.Infrastructure.Events.Domain.Stores;
 
 internal sealed class DomainQueueStore : IDomainQueueStore
 {

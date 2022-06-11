@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Reflection;
+using System.Text.Json;
+using Microsoft.Extensions.Options;
 using ModU.Abstract.Contexts;
 using ModU.Abstract.Domain;
 using ModU.Abstract.Security;
 using ModU.Abstract.Time;
-using ModU.Infrastructure.Events.Options;
-using System.Reflection;
-using System.Text.Json;
-using ModU.Infrastructure.Events.Entities;
+using ModU.Infrastructure.Events.Domain.Entities;
+using ModU.Infrastructure.Events.Domain.Options;
 
-namespace ModU.Infrastructure.Events.Factories;
+namespace ModU.Infrastructure.Events.Domain.Factories;
 
 internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
 {
@@ -43,7 +43,7 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
             TransactionId = transactionId,
             TraceId = _appContext.TraceContext.TraceId,
             SpanId = _appContext.TraceContext.SpanId,
-            MaxAttempts = _options.Value.MaxRetryAttempts,
+            MaxAttempts = 10,
             Name = domainEventAttribute?.Name ?? type.Name,
             Type = type.FullName!,
             Data = JsonSerializer.SerializeToDocument(domainEvent)

@@ -2,10 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ModU.Abstract.Commands;
 using ModU.Abstract.Commands.Attributes;
-using ModU.Infrastructure.Commands.Decorators;
 using ModU.Infrastructure.Database;
-using ModU.Infrastructure.DependencyInjection;
-using ModU.Infrastructure.Modules;
 
 namespace ModU.Infrastructure.Commands;
 
@@ -18,8 +15,6 @@ public static class Extensions
             throw new InvalidOperationException($"Cannot register type: '{unitOfWorkType}' as context.");
         }
 
-        ModuleTypeRegistry.Instance.AddUnitOfWork(unitOfWorkType);
-        
         var handlerTypes = assembly.GetTypes()
             .Where(t => t.IsGenericType && t.GetGenericTypeDefinition().IsAssignableTo(typeof(ICommandHandler<>)));
 
@@ -29,12 +24,7 @@ public static class Extensions
             var genericTypeArgument = type.GetGenericArguments().Single();
             var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
             serviceCollection.AddTransient(@interface, type);
-
-            if (transactionalAttribute is not null)
-            {
-                serviceCollection.Decorate(@interface,
-                    typeof(TransactionalDecorator<>).MakeGenericType(genericTypeArgument));
-            }
+            
         }
 
         return serviceCollection;

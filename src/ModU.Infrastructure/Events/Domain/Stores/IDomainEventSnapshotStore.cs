@@ -1,6 +1,6 @@
-using ModU.Infrastructure.Events.Entities;
+using ModU.Infrastructure.Events.Domain.Entities;
 
-namespace ModU.Infrastructure.Events.Stores;
+namespace ModU.Infrastructure.Events.Domain.Stores;
 
 public interface IDomainEventSnapshotStore
 {

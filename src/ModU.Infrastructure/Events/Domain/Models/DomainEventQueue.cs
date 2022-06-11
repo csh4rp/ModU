@@ -1,9 +1,9 @@
 ﻿using System.Runtime.CompilerServices;
 using ModU.Abstract.Time;
-using ModU.Infrastructure.Events.Entities;
-using ModU.Infrastructure.Events.Stores;
+using ModU.Infrastructure.Events.Domain.Entities;
+using ModU.Infrastructure.Events.Domain.Stores;
 
-namespace ModU.Infrastructure.Events.Models;
+namespace ModU.Infrastructure.Events.Domain.Models;
 
 internal sealed class DomainEventQueue : IDomainEventQueue
 {
