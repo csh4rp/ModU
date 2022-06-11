@@ -3,6 +3,8 @@ using System.Text.Json;
 using Microsoft.Extensions.Options;
 using ModU.Abstract.Contexts;
 using ModU.Abstract.Domain;
+using ModU.Abstract.Events;
+using ModU.Abstract.Events.Domain;
 using ModU.Abstract.Security;
 using ModU.Abstract.Time;
 using ModU.Infrastructure.Events.Domain.Entities;

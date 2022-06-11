@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModU.Abstract.Domain;
+using ModU.Abstract.Events;
+using ModU.Abstract.Events.Domain;
 
 namespace ModU.Infrastructure.Tests.Events.TestData;
 

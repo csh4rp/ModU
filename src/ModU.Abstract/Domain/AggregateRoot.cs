@@ -1,4 +1,7 @@
-﻿namespace ModU.Abstract.Domain;
+﻿using ModU.Abstract.Events;
+using ModU.Abstract.Events.Domain;
+
+namespace ModU.Abstract.Domain;
 
 public abstract class AggregateRoot : Entity
 {

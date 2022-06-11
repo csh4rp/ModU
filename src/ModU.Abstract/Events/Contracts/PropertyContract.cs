@@ -1,4 +1,4 @@
-﻿namespace ModU.Abstract.Messaging.Contracts;
+﻿namespace ModU.Abstract.Events.Contracts;
 
 internal sealed class PropertyContract
 {
