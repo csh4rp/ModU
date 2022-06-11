@@ -23,5 +23,6 @@ public class DomainEventQueueLock
     {
         RenewedAt = renewedAt;
         ExpiresAt = expiredAt;
+        Version++;
     }
 }

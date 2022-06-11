@@ -1,14 +1,14 @@
-﻿using ModU.Abstract.Domain;
-using ModU.Abstract.Events;
+﻿using System.Text.Json;
 using ModU.Abstract.Events.Domain;
 using ModU.Infrastructure.Events.Domain.Entities;
 
 namespace ModU.Infrastructure.Events.Domain.Factories;
 
-public class DomainEventFactory : IDomainEventFactory
+internal sealed class DomainEventFactory : IDomainEventFactory
 {
     public IDomainEvent Create(DomainEventSnapshot snapshot)
     {
-        return null;
+        var type = Type.GetType(snapshot.Type);
+        return (IDomainEvent)snapshot.Data.Deserialize(type!)!;
     }
 }
