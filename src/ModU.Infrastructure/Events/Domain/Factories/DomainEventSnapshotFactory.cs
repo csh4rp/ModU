@@ -17,17 +17,15 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
     private readonly IAppContext _appContext;
     private readonly IClock _clock;
     private readonly IHasher _hasher;
-    private readonly IOptions<DomainEventOptions> _options;
 
     public DomainEventSnapshotFactory(IAppContext appContext, IClock clock, IHasher hasher, IOptions<DomainEventOptions> options)
     {
         _appContext = appContext;
         _clock = clock;
         _hasher = hasher;
-        _options = options;
     }
 
-    public DomainEventSnapshot Create<T>(T domainEvent, Guid aggregateId, Type aggregateType, Guid? transactionId) where T : IDomainEvent
+    public DomainEventSnapshot Create<T>(T domainEvent, Guid aggregateId, Type aggregateType, Guid transactionId) where T : IDomainEvent
     {
         var aggregateTypeName = aggregateType.FullName!;
         var queueName = GetQueueName(aggregateId, aggregateTypeName);

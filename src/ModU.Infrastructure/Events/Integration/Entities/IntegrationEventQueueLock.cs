@@ -23,5 +23,6 @@ public class IntegrationEventQueueLock
     {
         RenewedAt = renewedAt;
         ExpiresAt = expiredAt;
+        Version++;
     }
 }
