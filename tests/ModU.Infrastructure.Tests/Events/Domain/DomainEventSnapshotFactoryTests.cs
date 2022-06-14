@@ -29,7 +29,7 @@ public class DomainEventSnapshotFactoryTests
         _hasher = Substitute.For<IHasher>();
         _appContext = Substitute.For<IAppContext>();
         _options = Substitute.For<IOptions<DomainEventOptions>>();
-        _factory = new DomainEventSnapshotFactory(_appContext, _clock, _hasher, _options);
+        _factory = new DomainEventSnapshotFactory(_appContext, _clock, _hasher);
     }
 
     [Fact]

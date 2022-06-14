@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Text.Json;
-using Microsoft.Extensions.Options;
 using ModU.Abstract.Contexts;
 using ModU.Abstract.Domain;
 using ModU.Abstract.Events;
@@ -8,7 +7,6 @@ using ModU.Abstract.Events.Domain;
 using ModU.Abstract.Security;
 using ModU.Abstract.Time;
 using ModU.Infrastructure.Events.Domain.Entities;
-using ModU.Infrastructure.Events.Domain.Options;
 
 namespace ModU.Infrastructure.Events.Domain.Factories;
 
@@ -18,7 +16,7 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
     private readonly IClock _clock;
     private readonly IHasher _hasher;
 
-    public DomainEventSnapshotFactory(IAppContext appContext, IClock clock, IHasher hasher, IOptions<DomainEventOptions> options)
+    public DomainEventSnapshotFactory(IAppContext appContext, IClock clock, IHasher hasher)
     {
         _appContext = appContext;
         _clock = clock;
@@ -43,7 +41,7 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
             TransactionId = transactionId,
             TraceId = _appContext.TraceContext.TraceId,
             SpanId = _appContext.TraceContext.SpanId,
-            MaxAttempts = 10,
+            MaxAttempts = domainEventAttribute?.MaxRetryAttempts ?? 10,
             Name = domainEventAttribute?.Name ?? type.Name,
             Type = type.FullName!,
             Data = JsonSerializer.SerializeToDocument(domainEvent)
