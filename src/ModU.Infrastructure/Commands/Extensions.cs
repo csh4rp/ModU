@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using ModU.Abstract.Commands;
-using ModU.Abstract.Commands.Attributes;
 using ModU.Infrastructure.Database;
+using ModU.Infrastructure.DependencyInjection;
 
 namespace ModU.Infrastructure.Commands;
 
@@ -21,10 +21,10 @@ public static class Extensions
         foreach (var type in handlerTypes)
         {
             var @interface = type.GetInterfaces().Single();
-            var genericTypeArgument = type.GetGenericArguments().Single();
-            var transactionalAttribute = type.GetCustomAttribute<TransactionalAttribute>();
+            var genericType = type.GetGenericArguments()[0];
             serviceCollection.AddTransient(@interface, type);
-            
+            var decoratorType = typeof(ICommandHandler<>).MakeGenericType(genericType);
+            serviceCollection.Decorate(type, decoratorType);
         }
 
         return serviceCollection;
