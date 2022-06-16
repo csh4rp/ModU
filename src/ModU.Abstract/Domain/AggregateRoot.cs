@@ -1,21 +1,17 @@
-﻿using ModU.Abstract.Events;
-using ModU.Abstract.Events.Domain;
+﻿using ModU.Abstract.Events.Domain;
 
 namespace ModU.Abstract.Domain;
 
-public abstract class AggregateRoot : Entity
+public abstract class AggregateRoot : Entity, IAggregateRoot
 {
-    private Queue<IDomainEvent>? _domainEvents;
+    private readonly Queue<IDomainEvent> _domainEvents = new(1);
+    private int _version;
 
-    protected void EnqueueEvent(IDomainEvent domainEvent)
+    protected void EnqueueEvent(IDomainEvent domainEvent) => _domainEvents.Enqueue(domainEvent);
+    
+    IEnumerable<IDomainEvent> IAggregateRoot.DequeueEvents()
     {
-        _domainEvents ??= new Queue<IDomainEvent>();
-        _domainEvents.Enqueue(domainEvent);
-    }
-
-    public IEnumerable<IDomainEvent> DequeueEvents()
-    {
-        if (_domainEvents is null || _domainEvents.Count == 0)
+        if (_domainEvents.Count == 0)
         {
             yield break;
         }
@@ -25,4 +21,6 @@ public abstract class AggregateRoot : Entity
             yield return domainEvent;
         }
     }
+
+    int IAggregateRoot.Version => _version;
 }

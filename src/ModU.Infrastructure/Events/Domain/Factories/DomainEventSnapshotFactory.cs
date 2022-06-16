@@ -23,10 +23,10 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
         _hasher = hasher;
     }
 
-    public DomainEventSnapshot Create<T>(T domainEvent, Guid aggregateId, Type aggregateType, Guid transactionId) where T : IDomainEvent
+    public DomainEventSnapshot Create<T>(T domainEvent, IAggregateRoot aggregateRoot, Guid transactionId) where T : IDomainEvent
     {
-        var aggregateTypeName = aggregateType.FullName!;
-        var queueName = GetQueueName(aggregateId, aggregateTypeName);
+        var aggregateTypeName = aggregateRoot.GetType().FullName!;
+        var queueName = GetQueueName(aggregateRoot.Id, aggregateTypeName);
         var type = domainEvent.GetType();
         var domainEventAttribute = type.GetCustomAttribute<DomainEventAttribute>();
 
@@ -34,8 +34,9 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
         {
             Id = Guid.NewGuid(),
             CreatedAt = _clock.Now(),
-            AggregateId = aggregateId,
+            AggregateId = aggregateRoot.Id,
             AggregateType = aggregateTypeName,
+            AggregateVersion = aggregateRoot.Version,
             Queue = queueName,
             UserId = _appContext.IdentityContext?.UserId,
             TransactionId = transactionId,

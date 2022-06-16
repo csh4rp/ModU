@@ -8,6 +8,7 @@ public sealed class DomainEventSnapshot
     public DateTime CreatedAt { get; init; }
     public Guid AggregateId { get; init; }
     public string AggregateType { get; init; } = null!;
+    public int AggregateVersion { get; init; }
     public string Queue { get; init; } = null!;
     public Guid? UserId { get; init; }
     public Guid? TransactionId { get; init; }
