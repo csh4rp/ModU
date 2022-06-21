@@ -7,6 +7,7 @@ using ModU.Abstract.Events.Domain;
 using ModU.Abstract.Security;
 using ModU.Abstract.Time;
 using ModU.Infrastructure.Events.Domain.Entities;
+using EventInfo = ModU.Infrastructure.Events.Domain.Entities.EventInfo;
 
 namespace ModU.Infrastructure.Events.Domain.Factories;
 
@@ -26,29 +27,20 @@ internal sealed class DomainEventSnapshotFactory : IDomainEventSnapshotFactory
     public DomainEventSnapshot Create<T>(T domainEvent, IAggregateRoot aggregateRoot, Guid transactionId) where T : IDomainEvent
     {
         var aggregateTypeName = aggregateRoot.GetType().FullName!;
-        var queueName = GetQueueName(aggregateRoot.Id, aggregateTypeName);
+        var eventGroup = GetEventGroup(aggregateRoot.Id, aggregateTypeName);
         var type = domainEvent.GetType();
-        var domainEventAttribute = type.GetCustomAttribute<DomainEventAttribute>();
+        var domainEventAttribute = type.GetCustomAttribute<DomainEventAttribute>()!;
 
-        return new DomainEventSnapshot
-        {
-            Id = Guid.NewGuid(),
-            CreatedAt = _clock.Now(),
-            AggregateId = aggregateRoot.Id,
-            AggregateType = aggregateTypeName,
-            AggregateVersion = aggregateRoot.Version,
-            Queue = queueName,
-            UserId = _appContext.IdentityContext?.UserId,
-            TransactionId = transactionId,
-            TraceId = _appContext.TraceContext.TraceId,
-            SpanId = _appContext.TraceContext.SpanId,
-            MaxAttempts = domainEventAttribute?.MaxRetryAttempts ?? 10,
-            Name = domainEventAttribute?.Name ?? type.Name,
-            Type = type.FullName!,
-            Data = JsonSerializer.SerializeToDocument(domainEvent)
-        };
+        var aggregateInfo = new AggregateInfo(aggregateRoot.Id, aggregateRoot.Version, aggregateTypeName);
+        var deliveryInfo = new DeliveryInfo(domainEventAttribute.MaxRetryAttempts);
+        var traceInfo = new TraceInfo(transactionId, _appContext.IdentityContext?.UserId,
+            _appContext.TraceContext.TraceId, _appContext.TraceContext.SpanId);
+        var eventInfo = new EventInfo(domainEvent.Id, aggregateRoot.Version, eventGroup, domainEventAttribute.Name, 
+            typeof(T).FullName!, JsonSerializer.SerializeToDocument(domainEvent));
+
+        return new DomainEventSnapshot(_clock.Now(), deliveryInfo, traceInfo, eventInfo, aggregateInfo);
     }
 
-    private string GetQueueName(Guid aggregateId, string aggregateType) 
+    private string GetEventGroup(Guid aggregateId, string aggregateType) 
         => _hasher.ComputeMD5Hash(aggregateId + aggregateType);
 }

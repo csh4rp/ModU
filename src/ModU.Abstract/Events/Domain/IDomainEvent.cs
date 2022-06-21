@@ -4,5 +4,5 @@ namespace ModU.Abstract.Events.Domain;
 
 public interface IDomainEvent : IEvent
 {
-    
+    Guid Id { get; }
 }
